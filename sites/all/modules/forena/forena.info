@@ -1,0 +1,14 @@
+name = Forena Reports
+description = General Report Writing Tool.
+core = 7.x
+files[] = forena.test
+files[] = ForenaViewsPlugin.inc
+testing_api = 2.x
+package = Forena
+
+; Information added by  packaging script on 2013-11-11
+version = "7.x-3.12"
+core = "7.x"
+project = "forena"
+datestamp = "1384187312"
+

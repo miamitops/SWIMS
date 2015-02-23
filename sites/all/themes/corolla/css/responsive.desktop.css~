@@ -1,0 +1,323 @@
+/**
+ * Do not delete or rename this file, if you do not use it leave it blank.
+ */
+th,td {
+  padding: 10px 14px;
+}
+#logo{
+	width: 210px;
+	float: left;
+}
+#main-content{
+	background:#c1ffaa;
+	padding-top:10px;
+	padding-bottom:10px;
+	border-radius: 8px;
+}
+.region.region-footer{
+    border-radius: 8px;
+    padding-top: 10px;
+    background: #c1ffaa;
+}
+.region-header{
+	padding:0px;
+	display:block;
+	width: 100%;
+	margin-left: 10px;
+	margin-right: 10px;
+	padding-top: 0px;
+}
+#header-wrapper header {
+clear: both;
+display: block;
+width: 100%;
+}
+#branding{
+	padding: 20px;
+	border-right: 1px solid #ccf;
+	border-left: 1px solid #ccf;
+	width: 95%;
+	display: block;
+	margin-bottom: 0px;
+}
+.clearfix.with-logo{
+	padding-bottom:10px;
+}
+#site-name{
+    font-size: 34px;
+    font-family: serif;
+    letter-spacing: -5px;
+}
+#name-and-slogan{
+	float:right;
+}
+.view-content .views-table{}
+.view-content .views-table thead{
+    background: #c1ffaa;
+    border-left: 1px solid #c1ffaa;
+    border-right: 1px solid #c1ffaa;
+}
+.view-content .views-table tr th{
+    padding-top: 3px;
+    padding-bottom: 3px;
+    background: #c1ffaa;
+}
+.view-content .views-table tr th.views-field-title{
+    width: 30%;
+}
+.views-exposed-widget{
+    background: aliceblue;
+    padding: 5px !important;
+    margin-right: 5px !important;
+    margin-bottom: 5px;
+    width: 16%;
+}
+.views-widget-filter-type_1{
+    width: auto;
+}
+.views-widget-filter-field_ec_25_c_value{
+    width: 16%;
+	
+    background: aliceblue;
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+    margin-right: 5px;
+    padding-bottom: 5px !important;
+}
+#main-content .content-margin .content-style{
+    padding: 10px;
+	
+    border: 1px solid #ccf;
+    text-align: justify;
+}
+.region-footer .region-inner .block .block-inner .block-title{
+	padding-left:8px;
+	background:#fff;
+	border-bottom:1px solid #999;
+	box-shadow:1px 1px 3px #999;
+	
+
+}
+.region-footer .region-inner .block .block-inner .block-content{
+	margin-left:8px;
+	margin-right:8px;
+	width: 94%;
+	
+}
+.region-footer .region-inner .block .block-inner, #block-system-navigation .block-inner{
+	border:1px solid #ccf;
+	padding:8px;
+	width: 85%;
+	float:left;
+	box-shadow: 1px 1px 14px;
+	background: #ccffdd;
+	padding-left: 0px;
+	padding-right: 0px;
+}
+.block-title{
+text-transform:capitalize;
+}
+#search-block-form{
+	margin-bottom:5px;
+}
+footer{
+	background:#fff;
+	margin-bottom:10px;
+	padding: 10px;
+	border-bottom-right-radius: 8px;
+	border-bottom-left-radius: 8px;
+}
+#content-column, .content-column, div.sidebar {
+float: left;
+}
+.field-type-field-collection h3.field-label{
+	width:auto;
+	float:left;
+	padding-right:8px;
+}
+.field-type-field-collection{
+	width:100%;
+	clear:both;
+	display:inline-table;
+}
+.field-type-field-collection h3.field-label:after{
+	content:":"
+	}
+.field-type-field-collection div.view-mode-full{
+	width:auto;
+	float:left;
+	padding-right:8px;
+}
+
+.view-maps-data .view-content .views-row{
+    border: 2px solid #c1ffaa;
+    padding: 10px;
+    margin-bottom: 10px;
+    padding-top: 0px;
+    box-shadow: 1px 1px 8px #aaffaa;
+    display: table;
+    width: 97%;
+}
+.view-maps-data .view-content .views-field-title{
+    background: #c1ffaa;
+    padding-left: 8px;
+    padding-right: 8px;
+    border-bottom-right-radius: 8px;
+    border-bottom-left-radius: 8px;
+    font-weight: bold;
+}
+.view-maps-data .view-content .wrapper span{
+    float: left;
+    margin-right: 8px;
+}
+.view-maps-data .view-content .wrapper{
+    width: 48%;
+    float: left;
+    padding-left: 1%;
+    padding-right: 1%;
+}
+.view-maps-data .views-field.views-field-type{
+    width: 48%;
+    float: left;
+    padding-left: 1%;
+    padding-right: 1%;
+}
+.view-maps-data .views-field.views-field-type span{
+    padding-right: 10px;
+    float: left;
+}
+.view-maps-data .view-content .views-field-title a{
+    font-weight: bold;
+	
+    color: #000;}
+.view-maps-data .view-content .views-field-title a:hover{
+    font-weight: bold;
+	color:blue
+}
+.region-header .block {
+margin-top:0px;
+margin-left:12px;
+}
+.om-maximenu-tabbed-scrollh .om-maximenu-tabbed-content, .om-maximenu-tabbed-scrollv .om-maximenu-tabbed-content{
+height:30px;
+}
+.om-maximenu.om-maximenu-block ul.om-menu {
+	width: 99%;
+background:#c1ffaa;
+
+	border-bottom-left-radius: 8px;
+	overflow: hidden;
+	border-bottom-right-radius: 8px;
+	border-left: 1px solid #ccf;
+	border-right: 1px solid #ccf;
+	border-top: 3px double #9fd;
+	padding-bottom: 5px;
+}
+.field-label{
+	text-align:left;
+	float:left;
+}
+.om-maximenu.om-maximenu-block.om-maximenu-row ul.om-menu li.om-leaf {
+float: left;
+box-shadow: 5px 2px 12px 1px #246F01 inset;
+border-radius: 5px;
+margin-left:5px;
+margin-right:5px;
+}
+.group-dt-mgmt-l{
+	width:45%;
+	float:left;
+	margin-right:1%;
+	padding:1%;
+}
+.group-data-mgmt-r{
+	width:45%;
+	float:left
+	
+}
+.block-om-maximenu .block-inner{
+	margin-left:0px;
+}
+#block-om-maximenu-om-maximenu-1{
+width:100%;
+}
+maximenu-block.om-maximenu-row ul.om-menu li.om-leaf {
+float: left;
+border-left: 1px solid #000;
+margin-left: -1px;
+box-shadow: 5px 2px 12px 1px #246F01 inset;
+border-radius: 5px;
+}
+.openlayers-tooltip-name{
+font-weight:bold;
+
+color:#fff;
+}
+.openlayers-tooltip-name a{
+font-weight:bold;
+color:blue;
+}.openlayers-tooltip-name a:active{
+font-weight:bold;
+color:blue;
+}
+.openlayers-tooltip-name a:visited{
+font-weight:bold;
+color:#fff;
+}
+.openlayers-tooltip-name a:hover{
+font-weight:bold;
+color:#99f;
+}
+.om-maximenu.om-maximenu-block.om-maximenu-row ul.om-menu li.om-leaf {
+font-weight:bold;
+}
+#content-wrapper{
+margin-bottom:5px;
+}
+.region-footer .region-inner .block{
+display: table;
+float: left;
+clear: none;
+width: 25%;
+}
+.horizontal-tabs ul.horizontal-tabs-list li {
+background:#c1ffaa;
+}
+.horizontal-tabs ul.horizontal-tabs-list li:hover, .horizontal-tabs ul.horizontal-tabs-list li:focus {
+background-color:#fff;
+}
+.horizontal-tabs h3{
+	font-size: 15px;
+}
+.horizontal-tabs h3.field-label{
+	color:#1f3
+	
+}
+.horizontal-tabs .field-label{
+	color:#1f3;
+	font-size: 15px;
+	margin-right:8px;
+}
+.horizontal-tabs ul.horizontal-tabs-list {
+
+background-color: #c1ffaa;
+
+}
+.source.water-quality{
+}
+.source.water-quality{
+width: 48%;
+float: left;
+background: #fff;
+padding: 5px;
+}
+.openlayers-tooltip-description{
+width: 48%;
+float: left;
+margin-right: 5px;
+padding:5px;
+}
+
+
+
+

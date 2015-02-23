@@ -1,0 +1,1493 @@
+<?php
+
+require_once 'Frx.inc';
+
+/**
+ * Implementation of hook_menu.
+ *
+ * @return array
+ */
+function forena_menu() {
+  $items = array();
+
+  // First build menu items.
+  Frx::Menu()->addMenuItems($items);
+
+  $items['admin/structure/forena'] = array(
+    'type' => MENU_NORMAL_ITEM,
+    'title' => 'Forena Reports',
+    'description' => 'Build reports based on data in your sites databases.',
+    'page callback' => 'forena_admin_reports',
+    'access arguments' => array('design any report'),
+    'file' => 'forena.admin.inc',
+  );
+
+  $items['admin/structure/forena/reports'] = array(
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'title' => 'Reports',
+    'description' => 'Build reports based on data in your sites databases.',
+    'page callback' => 'forena_admin_reports',
+    'access arguments' => array('design any report'),
+    'file' => 'forena.admin.inc',
+  );
+
+  $items['admin/config/content/forena'] = array(
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('forena_settings'),
+    'title' => 'Forena Reports',
+    'description' => 'Tell Forena where to store report files and how users should access them.',
+    'access arguments' => array('administer forena reports'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'forena.admin.inc',
+  );
+
+  $items['admin/config/content/forena/general'] = array(
+    'title' => 'General',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'file' => 'forena.admin.inc',
+    'weight' => -10,
+  );
+
+  $items['admin/config/content/forena/data/configure'] = array(
+    'title' => 'Configure data source',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('forena_data_settings_edit'),
+    'type' => MENU_CALLBACK,
+    'file' => 'forena.admin.inc',
+    'access arguments' => array('administer forena reports'),
+  );
+
+  $items['admin/config/content/forena/data/add'] = array(
+    'title' => 'Add data source',
+    'type' => MENU_CALLBACK,
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('forena_data_settings_edit'),
+    'file' => 'forena.admin.inc',
+    'access arguments' => array('administer forena reports'),
+  );
+
+  $items['admin/config/content/forena/data'] = array(
+    'title' => 'Data',
+    'page callback' => 'forena_data_settings',
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'forena.admin.inc',
+    'access arguments' => array('administer forena reports'),
+  );
+
+  $items['admin/config/content/forena/formats']  = array(
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('forena_doc_formats_settings'),
+    'title' => 'Document Types',
+    'access arguments' => array('administer forena reports'),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'forena.admin.inc',
+  );
+
+  $items['reports/%'] = array(
+    'page callback' => 'forena_report',
+    'page arguments' => array(1),
+    'title' => 'Reports',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+    'file' => 'forena.common.inc',
+  );
+
+  $items['report_doc/%'] = array(
+    'page callback' => 'forena_report',
+    'page arguments' => array(1),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+    'file' => 'forena.common.inc',
+  );
+
+
+  $items['reports/%/view'] = array(
+    'title' => 'View',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+    'file' => 'forena.common.inc',
+    'access arguments' => array('design any report'),
+  );
+
+  $items['reports/%/edit'] = array(
+     'title' => 'Edit',
+     'page callback' => 'drupal_get_form',
+     'page arguments' => array( 'forena_layout_form',1),
+     'access arguments' => array('design any report'),
+     'description' => 'Edit the layout of your report',
+     'type' => MENU_LOCAL_TASK,
+     'file' => 'forena.admin.inc',
+  );
+
+  if (module_exists('locale')) {
+    $items['reports/%/translations'] = array(
+       'page callback' => 'forena_report_translations',
+       'page arguments' => array(1),
+       'title' => 'Translate',
+       'file' => 'forena.admin.inc',
+       'access arguments' => array('design any report'),
+       'type' => MENU_LOCAL_TASK,
+    );
+  }
+  $items['reports/%/edit/params'] = array(
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('forena_admin_params_form', 1),
+    'title' => 'Parameters',
+    'file' => 'forena.admin.inc',
+    'access arguments' => array('design any report'),
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  $items['reports/%/edit/params/add'] = array(
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('forena_add_param_form', 1),
+    'file' => 'forena.admin.inc',
+    'title' => 'Parameters',
+    'access arguments' => array('design any report'),
+    'type' => MENU_CALLBACK,
+  );
+
+
+  $items['reports/%/edit/layout'] = array(
+     'title' => 'Layout',
+     'page callback' => 'drupal_get_form',
+     'page arguments' => array('forena_layout_form',1),
+     'access arguments' => array('design any report'),
+     'description' => 'Edit the layout of your report',
+     'type' => MENU_DEFAULT_LOCAL_TASK,
+     'file' => 'forena.admin.inc',
+  );
+
+  $items['reports/%/edit/data'] = array(
+     'title' => 'Data',
+     'page callback' => 'drupal_get_form',
+     'page arguments' => array('forena_data_block_form', 1),
+     'access arguments' => array('design any report'),
+     'description' => 'Add a data block to your report',
+     'file' => 'forena.admin.inc',
+     'type' => MENU_LOCAL_TASK,
+
+  );
+
+  $items['reports/%/edit/data/add'] = array(
+     'title' => 'Data',
+     'file' => 'forena.admin.inc',
+     'page callback' => 'drupal_get_form',
+     'page arguments' => array('forena_add_data_block_form', 1),
+     'access arguments' => array('design any report'),
+     'description' => 'Add a data block to your report',
+     'type' => MENU_CALLBACK,
+
+  );
+  $items['reports/%/edit/fields'] = array(
+     'title' => 'Fields',
+     'page callback' => 'drupal_get_form',
+     'page arguments' => array('forena_fields_form',1),
+     'access arguments' => array('design any report'),
+     'description' => 'Edit the fields of your report',
+     'file' => 'forena.admin.inc',
+     'type' => MENU_LOCAL_TASK,
+  );
+
+  $items['reports/%/edit/format'] = array(
+     'title' => 'Format',
+     'page callback' => 'drupal_get_form',
+     'page arguments' => array('forena_format_form', 1),
+     'access arguments' => array('design any report'),
+     'file' => 'forena.admin.inc',
+     'description' => 'Style and document options',
+     'type' => MENU_LOCAL_TASK,
+  );
+
+  $items['reports/%/delete'] = array(
+     'title' => 'Delete Report',
+     'page callback' => 'drupal_get_form',
+     'page arguments' => array('forena_delete_form', 1),
+     'access arguments' => array('delete report'),
+     'type' => MENU_NORMAL_ITEM,
+     'file' => 'forena.admin.inc',
+  );
+
+  $items['reports/add'] = array(
+     'title' => 'Create Report',
+     'page callback' => 'drupal_get_form',
+     'page arguments' => array('forena_add_report_form'),
+     'access arguments' => array('create any report'),
+     'description' => 'Create a new report',
+     'file' => 'forena.admin.inc',
+     'type' => MENU_NORMAL_ITEM,
+  );
+  $items['reports/%/add'] = array(
+     'title' => 'Create Report',
+     'page callback' => 'drupal_get_form',
+     'page arguments' => array('forena_add_report_form', 1),
+     'access arguments' => array('create any report'),
+     'description' => 'Create a new report from a template',
+     'file' => 'forena.admin.inc',
+     'type' => MENU_CALLBACK,
+  );
+
+  $items['reports/%/translate'] = array(
+     'title' => 'Translate Report',
+     'page callback' => 'drupal_get_form',
+     'page arguments' => array('forena_create_trans_form',1),
+     'access arguments' => array('create any report'),
+     'description' => 'Create a new report translation',
+     'file' => 'forena.admin.inc',
+     'type' => MENU_CALLBACK,
+  );
+
+  $items['forena'] = array(
+    'page callback' => 'forena_user_reports',
+    'page arguments' => array(),
+    'title' => 'My Reports',
+    'access arguments' => array('list reports'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['forena/xml/%'] = array(
+   	'page callback' => 'forena_block_xml',
+    'page arguments' => array(2),
+   	'access arguments' => array('access forena block xml'),
+    'file' => 'forena.common.inc',
+   	'type' => MENU_CALLBACK,
+  );
+
+  $items['forena/fields/format/autocomplete'] = array(
+     'page callback' => 'forena_fields_format_autocomplete',
+     'access callback' => TRUE,
+     'type' => MENU_CALLBACK,
+  );
+
+  $items['forena/data_block/autocomplete'] = array(
+     'page callback' => 'forena_data_block_autocomplete',
+     'access callback' => TRUE,
+     'type' => MENU_CALLBACK,
+  );
+
+  $items['forena/reports/autocomplete'] = array(
+     'page callback' => 'forena_reports_autocomplete',
+     'access callback' => TRUE,
+     'type' => MENU_CALLBACK,
+  );
+
+
+  $items['forena/categories/autocomplete'] = array(
+     'page callback' => 'forena_categories_autocomplete',
+     'access callback' => TRUE,
+     'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_admin_paths_alter().
+ */
+function forena_admin_paths_alter(&$paths) {
+  $paths['reports/*/*'] = TRUE;
+  $paths['reports/*/view'] = FALSE;
+  $paths['reports/add'] = TRUE;
+
+}
+
+
+/**
+ * Implementation of hook_block_info
+ */
+function forena_block_info() {
+  $blocks['forena_reports'] = array('info' => t('My reports'),
+      'status' => 1,
+      'region' => 'sidebar_first',
+      'visibility' => 1,
+      'pages' => 'forena',
+  );
+  return $blocks;
+}
+/**
+ * Implementation of hook_block_view
+ */
+function forena_block_view($delta = 0) {
+
+  // Inlcude the base library
+  require_once('forena.common.inc');
+  switch ($delta) {
+    case 'forena_reports':
+      $block = array('subject' => 'My Reports',
+            'content' => forena_my_reports_block());
+      break;
+  }
+  return $block;
+
+}
+
+
+/**
+ * Auto complete for categories
+ *
+ */
+
+function forena_categories_autocomplete($string='') {
+  require_once('forena.admin.inc');
+  $categories = @forena_get_categories($string);
+  print drupal_json_output($categories);
+}
+
+
+
+/**
+ * Auto complete for data blocks
+ * @param $string
+ * @return unknown_type
+ */
+function forena_data_block_autocomplete($string='') {
+  require_once('forena.admin.inc');
+  $data_blocks = forena_user_data_blocks($string);
+
+  if ($data_blocks) {
+    $temp = array_values($data_blocks);
+    $data_blocks = array_combine($temp, $temp);
+  }
+  else {
+    $data_blocks = array();
+  }
+
+  print drupal_json_output($data_blocks);
+}
+
+function forena_reports_autocomplete($string='', $string2='') {
+  GLOBAL $language;
+  $reports='';
+  $link = '';
+  // If we have two parameters.
+  if ($string2) {
+    $mode = $string;
+    $string = $string2;
+  }
+  $string = '%' .$string .'%';
+  $result = db_query('SELECT * FROM {forena_reports} where language=:language
+	  AND report_name like :string
+	  ORDER BY category,title', array(':language' => $language->language, ':string' => $string));
+  foreach ($result as $row) {
+    $access = TRUE;
+    $cache = $row->cache;
+
+    if ($cache) {
+      $cache = unserialize($cache);
+
+      // Check each callback function to see if we have an error.
+      if ($cache['access']) foreach ($cache['access'] as $callback => $args) {
+        if ($callback) foreach ($args as $arg) {
+          $access = FALSE;
+          if (function_exists($callback)) {
+            $a = @$callback($arg);
+          }
+          if ($a) $access = TRUE;
+        }
+        else {
+          $access = TRUE;
+        }
+      }
+    }
+    if ($access) {
+      $key = $row->report_name;
+      if ($mode == 'link') {
+        $key = 'reports/' . str_replace('/', '.', $key);
+      }
+      $reports[$key] = $key . ' - ' . $row->title;
+    }
+  }
+  return drupal_json_output($reports);
+}
+
+function forena_xml($block_name, $parms=array()) {
+  include_once('forena.common.inc');
+  drupal_alter('forena_parameters', $block_name, $parms );
+  //now invoke the data provider with the correct params
+  Frx::Data()->push($parms, 'parm');
+  return Frx::RepoMan()->data($block_name);
+}
+
+/**
+ * Auto complete for formats
+ * @param $string
+ * @return unknown_type
+ */
+function forena_fields_format_autocomplete($string='') {
+  require_once('forena.common.inc');
+  $matches = array();
+  $formats = @FrxReportGenerator::instance()->supported_formats();
+
+  if ($string == "*") {
+    $matches = $formats;
+    print drupal_json_output($matches);
+    return;
+  }
+
+  if ($formats && $string) foreach ($formats as $name => $value) {
+    if (strpos(strtolower($name), strtolower($string)) !== FALSE || strpos(strtolower($value), strtolower($string))!==FALSE) {
+      $matches[$name] = $value;
+    }
+  }
+  print drupal_json_output($matches);
+}
+
+/**
+ *  Calls forena_parameter_form
+ *  in forena.common.inc
+ */
+function forena_parameters_report() {
+  require_once('forena.admin.inc');
+  $m = Frx::Menu();
+  $name = $m->name;
+  $filename = $m->filename;
+  $format = $m->format;
+  $report = forena_get_report($name);
+  if ($report) {
+    $r = forena_report_object();
+    $o = drupal_get_form('forena_parameters_form');
+    return $o;
+  }
+  else {
+    drupal_not_found();
+  }
+}
+
+function forena_parameter_form($formid, &$form_state, $parameters, $attributes= array()) {
+  $parms = $_GET;
+  // Set menu parms
+  $menu_parms = Frx::Data()->getContext('menu-parms');
+  if ($menu_parms) $form_state['storage']['menu-parms'] = $menu_parms;
+  // Set Descriptors
+  $desc = FrxData::instance()->getContext('forenaReport');
+  if ($desc) $form_state['storage']['desc'] = $desc;
+  $desc = $form_state['storage']['desc'];
+  $report_name = @$desc['name'];
+
+  $collapse = isset($attributes['collapsed']) ? $attributes['collapsed'] : FALSE;
+  if (isset($form_state['values'])) {
+    $collapse=FALSE;
+    $parms = array_merge($parms, $form_state['values']['params']);
+    // In the case of ahah, we need to restore menu parameters from the form state.
+    if (isset($form_state['storage']['menu-parms'])) {
+      $menu_parms = $form_state['storage']['menu-parms'];
+      $parms = array_merge($menu_parms,$parms);
+
+    }
+    drupal_alter('forena_parameters', $report_name,  $parms);
+    Frx::Data()->push($parms, 'parm');
+  }
+  $template = @$attributes['template'];
+  $collapsible = isset($attributes['collapsible']) ? $attributes['collapsible'] : TRUE;
+  $title = isset($attributes['title']) ? $attributes['title'] : t('Parameters');
+  $submit_value = isset($attributes['submit']) ? $attributes['submit'] : t('Submit');
+
+  unset($parms['q']);
+  $form = array();
+
+
+  if ($parameters) {
+
+    //drupal_alter('forena_parameters', $report_name,  $parms);
+    if ($parameters) {
+
+      $form['params'] = array(
+          '#tree' => TRUE,
+          '#title' => $title,
+          '#type' => 'fieldset',
+          '#collapsible' => $collapsible,
+          '#collapsed' => $collapse,
+          '#prefix' => '<div id="parameters-wrapper">',
+          '#suffix' => '</div>',
+      );
+
+      foreach ($parameters as $node) {
+        $add_null = FALSE;
+        $list=array();
+        $disabled = FALSE;
+        $label = @(string)$node['label'];
+        $id = @(string)$node['id'];
+        $data_source = @(string)$node['data_source'];
+        $data_field = @(string)$node['data_field'];
+        $class = @(string)$node['class'];
+        $type = @(string)$node['type'];
+        $option_str = @(string)$node['options'];
+        $options = array();
+        if ($option_str) {
+          parse_str($option_str, $options);
+        }
+
+        if (isset($parms[$id])) {
+          $value = $parms[$id];
+          $multi_value=(array)$parms[$id];
+        }
+        else {
+          $value = @(string)$node['default'];
+          $multi_value = array();
+          if (strpos($value, '|')!==FALSE) $multi_value = explode('|', $value);
+        }
+        $desc =  @(string)$node['desc'];
+        $label_field = @(string)$node['label_field'];
+
+        @(strcmp((string)$node['require'], "1") == 0) ? $required = TRUE : $required = FALSE;
+        $ctl_attrs = array();
+
+        //returned values filtered against data_field attr.
+        if ($data_source) {
+          $list = Frx::RepoMan()->dataBlockParams($data_source, $data_field, $label_field);
+          if (!$required && $add_null) $list = array('' => '') + $list;
+        }
+
+        //Determine the form element type to be displayed
+        //If select or radios is chosen then begin a $list array for display values.
+        $multiselect = FALSE;
+        $ajax = FALSE;
+        $add_null = FALSE;
+        switch ($type) {
+          case 'multiselect':
+            $type = 'select';
+            $multiselect = TRUE;
+            $value = $multi_value;
+            break;
+          case 'multiselectajax':
+            $type = 'select';
+            $multiselect = TRUE;
+            $value = $multi_value;
+            $ajax = TRUE;
+            break;
+          case 'checkboxes':
+            $value = $multi_value;
+            break;
+          case 'selectajax':
+            $ajax = TRUE;
+            $type = 'select';
+            $add_null = TRUE;
+            break;
+          case 'select':
+            $add_null = TRUE;
+            break;
+          case 'date_text':
+          case 'date_select':
+          case 'date_popup':
+            $options['date_format'] = @$options['date_format'] ? $options['date_format'] : 'Y-m-d';
+            $ctl_attrs['#date_format'] = $options['date_format'];
+            if ($value){
+              $datetime = @strtotime($value);
+              if ($datetime) {
+                $value = date('Y-m-d h:i', $datetime);
+              }
+
+            }
+            $ctl_attrs['#forena_date_format'] = @$options['date_parm_format'] ? $options['date_parm_format'] : 'Y-m-d';
+
+            if (@$options['date_year_range']) {
+              $ctl_attrs['#date_year_range'] = $options['date_year_range'];
+            }
+            if (@$options['date_label_position']) {
+              $ctl_attrs['#date_label_position'] = $options['date_label_position'];
+            }
+
+            $list=array();
+            break;
+          case 'checkbox':
+            if (@$option_str['return_value']) {
+              $ctl_attrs['#return_value'] = $options['return_value'];
+            }
+            $list=array();
+            break;
+          case 'radios':
+            break;
+          case 'hidden':
+            $list=array();
+            break;
+          default:
+            $type = 'textfield';
+            $list = array();
+        }
+
+        if (isset($menu_parms[$id]) && $type=='textfield') {
+          $disabled = TRUE;
+        }
+
+        //If a data_source attr was found then create an array of
+        $form['params'][$id] = array(
+            '#type' => $type,
+            '#title' => ($label) ? t($label) : t($id),
+            '#default_value' => $value,
+            '#disabled' => $disabled,
+            '#required' => $required,
+            '#description' => t($desc),
+        );
+
+        $form['params'][$id] = array_merge($form['params'][$id], $ctl_attrs);
+
+        if ($type == 'item') {
+          $form['params'][$id]['#markup'] = $value;
+
+        }
+
+        if ($type == 'hidden') {
+          $form['params'][$id]['#value'] = $value;
+        }
+
+        // Add class to parmeter form.
+        if ($class) {
+          $form['params'][$id]['#attributes'] = array(
+              'class' => @explode(' ', $class),
+          );
+        }
+
+        //if $list is not empty then push options
+        //onto the array. options will cause an error for
+        //textfield elements.
+        if ($list || $type == 'select' || $type =='radios') {
+          if ($add_null) {
+            $prompt = @$options['prompt'];
+            if (!$prompt) $prompt = $required ? '-' . t('select') .  '-' : '-' .t('none') . '-';
+            $form['params'][$id]['#empty_option'] = $prompt ;
+          }
+          $form['params'][$id]['#options'] = $list;
+          $form['params'][$id]['#multiple'] = $multiselect;
+        }
+
+        if ($ajax) {
+          $form['params'][$id]['#ajax'] = array('callback' => 'forena_parameters_callback',
+              'wrapper' => 'parameters-wrapper');
+        }
+
+      }
+
+      if ($template) {
+        $form['params']['#forena-template'] = $template;
+        $form['params']['#theme'] = 'forena_fieldset_template';
+        _forena_set_inline_theme($form['params']);
+      }
+
+      $form['params']['submit'] = array(
+          '#type' => 'submit',
+          '#value' => $submit_value,
+      );
+
+    }
+    return $form;
+  }
+
+
+}
+
+
+/**
+ *
+ * gets the values from the params form
+ * redirects to the report page with the values in
+ * the querystring.
+ */
+function forena_parameter_form_submit($form, &$form_state) {
+  $values = $form_state['values'];
+  unset($values['params']['submit']);
+
+  if (isset($values['params'])) foreach ($values['params'] as $key => $value) {
+    $ctl = $form['params'][$key];
+    switch($ctl['#type']) {
+      case 'date_popup':
+      case 'date_select':
+      case 'date_text':
+        $datetime = @strtotime($value);
+        if ($datetime) {
+          $value = $values['params'][$key] = date($ctl['#forena_date_format'], $datetime);
+        }
+        break;
+
+    }
+
+    if (is_array($value)) {
+      $values['params'][$key] = array();
+      foreach ($value as $k => $val) {
+        if ($val) {
+          $values['params'][$key][] = $val;
+        }
+      }
+    }
+    else {
+      if (strpos($value, '|')!==FALSE) {
+        $values['params'][$key] = explode('|', $value);
+      }
+      elseif ($value==='' || $value===NULL) {
+        unset($values['params'][$key]);
+      }
+    }
+  }
+  $form_state['redirect']= array($_GET['q'], array('query' => @$values['params']));
+}
+
+/**
+ * Ajax form callback function
+ * Enter description here ...
+ * @param unknown_type $form
+ * @param unknown_type $form_state
+ */
+function forena_parameters_callback($form, &$form_state) {
+  return $form['params'];
+}
+
+/**
+ * Implementation of hook_perm
+ *
+ * @return unknown
+ */
+function forena_permission() {
+  $perms = array(
+    'administer forena reports' => array('title' => t('Administer Forena Reports')),
+    'access demo reports' => array('title' => t('Access Demo Reports')),
+    'list reports' => array('title' => t('List reports')),
+    'create any report' => array('title' => t('Create a report')),
+    'design any report' => array('title' => t('Design reports')),
+    'delete report' => array('title' => t('Delete reports')),
+    'perform email merge' => array('title' => t('Peform email merge')),
+    'access forena block xml' => array('title' => t('Access xml from data blocks directly'), 'description' => t('Useful for ajax calls to data blocks')),
+  );
+  return $perms;
+}
+
+
+
+function forena_user_reports() {
+  require_once('forena.common.inc');
+  $output='';
+  $reports = forena_get_user_reports();
+  $report_repos = variable_get('forena_path', 'reports');
+  if (!$reports) {
+    $output = 'No Reports Found';
+  }
+  $links = '';
+  foreach ($reports as $category => $reports) {
+    $links .= '<li><a href="#' . urlencode($category) . '">' . $category . '</a></li> ';
+    $output .= '<h3><a name="' . urlencode($category) . '"/>' . $category . '</h3>';
+    $output .= '<ul>';
+    foreach ($reports as $r) {
+      $output .= '<li>' . l($r['title'], $report_repos . '/' . str_replace('/', '.', $r['report_name'])) . '</li>';
+    }
+    $output .= '</ul       >';
+  }
+  return $output;
+}
+
+function forena_include_data_tables() {
+  static $init = FALSE;
+  if (!$init) {
+    $init = TRUE;
+    $lib = 'sites/all/libraries/dataTables/media/js/jquery.dataTables.min.js';
+    if (file_exists($lib)) {
+      drupal_add_js($lib);
+    }
+    $lib = 'sites/all/libraries/FixedColumns/media/js/FixedColumns.min.js';
+    if (file_exists($lib)) {
+      drupal_add_js($lib);
+    }
+    $lib = 'sites/all/libraries/FixedHeader/js/FixedHeader.min.js';
+    if (file_exists($lib)) {
+      drupal_add_js($lib);
+    }
+  }
+}
+
+/**
+ * Load and render a report based on a drupal path.
+ * In this function the arglist is used to get the full path to the report.
+ *
+ * @return unknown
+ */
+function forena_report($name_in, $parms = array(), $print = TRUE) {
+  require_once('forena.common.inc');
+  $desc = Frx::Menu()->parseURL($name_in);
+  if (!$desc['exists']) {
+    drupal_set_message(t('Report %s not found', array('%s' => $name_in)), 'error', FALSE);
+    return '';
+  }
+
+
+
+  FrxData::instance()->setContext('cookie', $_COOKIE);
+  FrxData::instance()->setContext('forenaReport', $desc);
+  $report_name = $desc['name'];
+  // Load dataTable plugin if possible.
+  //forena_include_data_tables();
+  $output = FrxReportGenerator::instance()->report($name_in, $parms, $print);
+  $m_path = drupal_get_path('module', 'forena');
+
+  if ($output) {
+    // This has been deprecated, but we'll eave it in for now.
+    if ($print) drupal_add_js($m_path . '/forena.js');
+    $forena_js = array();
+    $forena_js['form'] = preg_replace('/[^\w\-]+/u', '_', Frx::Skin()->name);
+    $forena_js['report'] = preg_replace('/[^\w\-]+/u', '_', $name_in);
+    if ($print) drupal_add_js(array('forena' => $forena_js), 'setting');
+    return $output;
+  }
+
+}
+
+/**
+ * Render report as an inlcude.  Don't perform the output fuctnions for the document
+ * @param $report_name String
+ * @param $parms array of parameters to include
+ */
+function forena_report_include($report_name, $parms=array()) {
+  $output = '';
+  require_once 'forena.common.inc';
+  $desc= Frx::Menu()->parseURL($report_name);
+  $name = $desc['name'];
+
+  $r = @FrxReportGenerator::instance()->get_report($name, $parms);
+  if (!$r || !$r->rpt_xml) {
+    return '';
+  }
+  //check for default parameters
+  $r->processParameters();
+  $format = $desc['format'];
+  $r->render($format, FALSE);
+
+  $o =  Frx::Document($format);
+  if ($o) {
+    $output = $o->render($r, $format,  array());
+  }
+  return $output;
+}
+
+
+/**
+ * Menu callback for rendering the forena report.
+ */
+function forena_report_menu_callback() {
+  $args = func_get_args();
+  $path = array_shift($args);
+  $report_name = array_shift($args);
+  $parms = $_GET;
+  unset($parms['q']);
+  $menu_parms = array();
+  $tokens = Frx::Menu()->tokens($path);
+  if ($args && $tokens) {
+    foreach ($args as $i=> $value) {
+      @$menu_parms[$tokens[$i]] = $value;
+    }
+  }
+
+  Frx::Data()->setContext('menu-parms', $menu_parms);
+  $parms = array_merge($parms, $menu_parms);
+  $output = forena_report($report_name, $parms);
+  if ($output) return $output;
+}
+
+/**
+ * Used in hook_menu to test access to menu items.
+ * @param $checks array key value of callbacks and args to check.
+ */
+function forena_check_all_access($checks) {
+  // Check each callback function to see if we have an error.
+  $access = FALSE;
+  if ($checks) foreach ((array)$checks as $callback => $args) {
+    if ($callback && $args) foreach ($args as $arg) {
+      if (function_exists($callback)) {
+        $a = $callback($arg);
+      }
+      if ($a) $access = TRUE;
+    }
+    else {
+      $access = TRUE;
+    }
+  }
+  return $access;
+}
+
+/**
+ * Callback for setting international titles
+ * @param $report_name string name of report
+ * @param $use_menu_title boolean indicate wether to use menu title attribute.
+ */
+function forena_report_title_callback($report_name, $use_menu_title=TRUE) {
+  GLOBAL $language;
+  $title = '';
+  $lang = $language->language;
+  $result = db_query('SELECT * FROM {forena_reports} where report_name = :name and language=:language',
+  array(':name' => $report_name, 'language' => $lang));
+  foreach ($result as $row) {
+    $cache = $row->cache;
+    if ($cache) {
+      $cache = unserialize($cache);
+      // Load menu item defaults
+      $menu = $cache['menu'];
+    }
+    $title = $use_menu_title && @$menu['title'] ? $menu['title']:  $row->title;
+  }
+  return $title;
+}
+
+
+
+/**
+ * Render report with some data
+ *
+ * @param string $report
+ * @param string $format
+ * @param mixed $data
+ * @return unknown
+ */
+function forena_render_report($report, $format='', $data='', $options= array(), $print = TRUE) {
+  require_once('forena.common.inc');
+  $o = forena_report_object($report, $data);
+  $output = $o->render($format, $print);
+
+  //If a format was requested render a custom non-drupal document
+  if ($format && $format != 'web') {
+    $output = FrxReportGenerator::instance()->generate_doc($format, $output, $options, $print);
+  }
+  return $output;
+}
+
+/**
+ * Self register plugins with forena.
+ *
+ */
+function forena_forena_plugins() {
+  $path = drupal_get_path('module', 'forena');
+
+  $plugins['FrxPDO'] = array('file' => 'plugins/FrxPDO.inc',
+                     'parent' => 'FrxDataSource',
+                     'class' => 'FrxPDO',
+                     'path' => $path,
+  );
+
+  $plugins['FrxOracle'] = array('file' => 'plugins/FrxOracle.inc',
+                     'parent' => 'FrxDataSource',
+                     'class' => 'FrxOracle',
+                     'path' => $path,
+  );
+
+  $plugins['FrxDrupal'] = array(
+                     'file' => 'plugins/FrxDrupal.inc',
+                     'parent' => 'FrxDataSource',
+                     'class' => 'FrxDrupal',
+                     'path' => $path,
+  );
+
+  $plugins['FrxFiles'] = array('file' => 'plugins/FrxFiles.inc',
+                     'parent' => 'FrxDataSource',
+                     'class' => 'FrxFiles',
+  );
+
+  $plugins['FrxPostgres'] = array('file' => 'plugins/FrxPostgres.inc',
+                     'class' => 'FrxPostgres',
+                     'parent' => 'FrxDataSource'
+  );
+
+  $plugins['FrxMSSQL'] = array('file' => 'plugins/FrxMSSQL.inc',
+                     'parent' => 'FrxDataSource',
+                     'class' => 'FrxMSSQL',
+                     'path' => $path,
+  );
+  // Normally you wouldn't do this but I wanted to make the FrxReport sytax work.
+  $plugins['FrxReport'] = array(
+    'file' => 'plugins/FrxReportContext.inc',
+    'parent' => 'FrxContext',
+    'class' => 'FrxReportContext',
+    'path' => $path,
+  );
+
+  return $plugins;
+}
+
+/**
+ * Self register document formats with Forena
+ *
+ */
+function forena_forena_document_types() {
+  require_once 'docformats/FrxWebDoc.inc';
+  require_once 'docformats/FrxCSVDoc.inc';
+  require_once 'docformats/FrxHtmlDoc.inc';
+  require_once 'docformats/FrxSVGDoc.inc';
+  require_once 'docformats/FrxWordDoc.inc';
+  require_once 'docformats/FrxXLSDoc.inc';
+  require_once 'docformats/FrxXMLDoc.inc';
+  require_once 'docformats/FrxEmailMergeDoc.inc';
+  $items['web'] = array(
+    'class' => 'FrxWebDoc',
+    'title' => t('Themed Drupal Page'),
+  );
+
+  $items['csv'] = array(
+    'class' => 'FrxCSVDoc',
+    'title' => t('Comma separated values'),
+  );
+
+  $items['email'] = array(
+    'class' => 'FrxEmailMergeDoc',
+    'title' => t('Email Merge Document'),
+  );
+
+  $items['html'] = array(
+    'class' => 'FrxHtmlDoc',
+    'title' => t('Unthemed HTML'),
+  );
+
+  $items['svg'] = array(
+    'class' => 'FrxSVGDoc',
+    'title' => t('SVG Document'),
+  );
+
+  $items['doc'] = array(
+    'class' => 'FrxWordDoc',
+    'title' => t('MS Word Document format'),
+  );
+
+  $items['xls'] = array(
+    'class' => 'FrxXLSDoc',
+    'title' => t('Excel Document'),
+  );
+
+  $items['xml'] = array(
+    'class' => 'FrxXMLDoc',
+    'title' => t('XML Document'),
+  );
+  return $items;
+}
+
+/**
+ * Self register controls with forena.
+ *
+ */
+function forena_forena_controls() {
+
+  $controls[] = array(
+    'file' => 'plugins/FrxControls.inc',
+    'class' => 'FrxControls',
+  );
+  $controls[] = array(
+    'file' => 'plugins/FrxDrupalControls.inc',
+    'class' => 'FrxDrupalControls',
+  );
+
+  $controls[] = array(
+    'file' => 'renderers/FrxSource.inc',
+    'class' => 'FrxSource',
+  );
+
+  $controls[] = array(
+    'file' => 'renderers/FrxXML.inc',
+    'class' => 'FrxXML',
+  );
+  $controls[] = array(
+    'file' => 'renderers/FrxInclude.inc',
+    'class' => 'FrxInclude',
+  );
+
+  $controls[] = array(
+    'file' => 'renderers/FrxParameterForm.inc',
+    'class' => 'FrxParameterForm',
+  );
+
+  $controls[] = array(
+    'file' => 'renderers/FrxTitle.inc',
+    'class' => 'FrxTitle',
+  );
+
+  $library_dir = FrxReportGenerator::instance()->configuration('library_path');
+  $library = rtrim($library_dir,'/') . '/SVGGraph/SVGGraph.php';
+  if (file_exists($library)) {
+    $controls[] = array(
+      'file' => 'renderers/FrxSVGGraph.inc',
+      'class' => 'FrxSVGGraph'
+      );
+  }
+  return $controls;
+}
+
+/**
+ * Implementation of forena_report_directory hook.
+ */
+function forena_forena_report_directory() {
+  return drupal_get_path('module', 'forena') . '/repos/reports';
+}
+
+/**
+ * Load the report repository path
+ *
+ * @return unknown
+ */
+function forena_report_path() {
+  return Frx::File()->dir;
+}
+
+/**
+ * Rename function for backwards compatibility
+ */
+function forena_current_user_uid() {
+  return forena_current_user_id();
+}
+
+/**
+ * Helper function for current user for the drupal instance
+ *
+ * @return unknown
+ */
+function forena_current_user_id() {
+  global $user;
+  return $user->uid;
+}
+
+/**
+ * Helper function for current user for the drupal instance
+ *
+ * @return unknown
+ */
+function forena_current_user_name() {
+  global $user;
+  if (isset($user->name)) return $user->name;
+}
+
+/**
+ * Implememntation of hook_filter
+ */
+function forena_filter_info() {
+
+  $filters['forena_report'] = array(
+    'title' => t('Embed Forena Reports'),
+    'description' => t('Allows you to embed a report in a text'),
+    'process callback' => '_forena_filter_process',
+    'cache' => FALSE,
+  );
+
+  return $filters;
+}
+
+/**
+ * Process tag replacement for xml filters
+ */
+function _forena_filter_process($text='') {
+  require_once('forena.admin.inc');
+  GLOBAL $language;
+  // initial Parameters
+  $in_parms = array();
+  $in_parms  = $_GET;
+
+  // Find the instances of [xmlreport:view,
+  if (preg_match_all("/\[report?:?([^\]]+)\]/i", $text, $match)) {
+
+    foreach ($match[1] as $idx => $value) {
+      $parms=array();
+      // Separate view from parmeters
+      @list($report_name, $parmsStr) = explode(':', $value);
+
+      // Get any static parmeters
+      $pairs = explode(',', $parmsStr);
+      if ($pairs) foreach ($pairs as $pair) {
+        @list($key, $value)=explode('=', $pair);
+        $parms[$key]=$value;
+      }
+
+      $parms = array_merge($parms, $in_parms);
+      // Render it
+      $output = forena_report($report_name, $parms, FALSE);
+
+      // Finally replace the parameters
+      $find[]=$match[0][$idx];
+      $replace[]=$output;
+    }
+    return str_replace($find, $replace, $text);
+  }
+  // If we didn't find anything return the text.
+  return $text;
+}
+
+/**
+ * Impementation of hook_mail
+ * Builds an email to send when mailing large numbers of users.
+ */
+function forena_mail($key, &$message, $parms) {
+  switch ($key) {
+    case 'mailmerge':
+      $message['subject'] = $parms['subject'];
+      $body = $parms['body'];
+      $message['body'][] = $body;
+      $htmlmail = FALSE;
+      break;
+  }
+}
+
+
+/**
+ * Make sure a drectory exists in the report path prior to save.
+ *
+ * @param $fullpath Full path to the drectory to be copied
+ * @param $recursive Whether we are in a recursive call.
+ */
+function _forena_verify_directory($fullpath, $recursive=FALSE) {
+  static $path='';
+  $success = TRUE;
+  if (!$recursive) {
+    $path = forena_report_path();
+    if (!is_writable($path)) {
+      drupal_set_message(t('Report directory %s is not modifiable', array('%s' => $path)), 'error');
+      return FALSE;
+    }
+  }
+  @list($dir, $file) = explode('/', $fullpath, 2);
+  $path .= '/' . $dir;
+
+  // Path
+  if (!file_exists($path) && $file) {
+    @mkdir($path);
+    if (!@is_writable($path)) {
+      drupal_set_message(t('Error creating directory %path', array('%path' => $path)), 'error');
+      return FALSE;
+    }
+
+  }
+  // Recurse to next file.
+  if ($file && strpos($file, '/')) {
+    _forena_verify_directory($file, TRUE);
+  }
+  return TRUE;
+}
+
+
+
+/**
+ * Recursively ,  all report files from the source directory to the destination directory
+ * @param $src_dir  Source directory to copy files from
+ */
+function _forena_copy_reports($src_dir, $overwrite=FALSE, $subdir=FALSE) {
+  static $dest_dir = '';
+  static $i = 0;
+  if (!$subdir) {
+    $dest_dir = forena_report_path();
+  }
+
+  if (!file_exists($dest_dir)) {
+    mkdir($dest_dir);
+  }
+
+  $d = dir($src_dir);
+  while (false !== ($rpt_file = $d->read())) {
+    $src_file = $d->path . '/' . $rpt_file;
+    $dest_file = $dest_dir . '/' . $rpt_file;
+
+    if (is_file($src_file)) {
+      if ((is_writable($dest_file) && $overwrite) || !file_exists($dest_file)) {
+        file_put_contents($dest_file, file_get_contents($src_file));
+        $i++;
+      } else {
+        drupal_set_message($dest_file . ' not writeable', 'error');
+      }
+    }
+    else {
+      if (strpos($rpt_file, '.')!==0) {
+        // Recurse into sub directory
+        $src_save = $src_dir;
+        $dest_save = $dest_dir;
+        $dest_dir .= '/' . $rpt_file;
+        $src_dir .= '/' . $rpt_file;
+        _forena_copy_reports($src_dir, $overwrite, TRUE);
+        $src_dir = $src_save;
+        $dest_dir = $dest_save;
+      }
+    }
+  }
+  $d->close();
+  return $i;
+}
+
+
+/**
+ * Load cache files from the database
+ */
+function forena_db_sync($subdir='') {
+  static $prefix = '';
+  static $skins = '';
+  if (!$subdir) {
+    $prefix = '';
+    db_delete('forena_reports')
+    ->execute();
+  }
+
+  $save_count=0;
+  $path =forena_report_path() . '/' . $subdir;
+  $d = dir($path);
+  if ($d) while (false !== ($rpt_file = $d->read())) {
+    $src_file = trim($d->path, '/') . '/' . trim($rpt_file, '/');
+    $dest_file = $path . '/' . trim($rpt_file, '/');
+    if (is_file($src_file)) {
+      @list($base_file, $ext) = explode('.', $rpt_file, 2);
+      switch($ext) {
+        // Load Forena Reports
+        case 'frx':
+          $base_file = trim($prefix . '/' . $base_file, '/');
+
+          try {
+            $r_xml =file_get_contents($src_file);
+          } catch (Exception $e) {
+            $s = t('unable to load Report %s', $r_xml);
+            forena_error($s, $s . $e->getMessage());
+
+          }
+
+          // Load the report
+
+          $r = new FrxReport($r_xml);
+          $save_count = forena_save_report($base_file, $r_xml, FALSE);
+          $r->__destruct();
+          unset($r);
+          break;
+
+          //load into list of skins
+        case 'skinfo':
+          $data = file_get_contents($src_file);
+          $skin = drupal_parse_info_format($data);
+          $skin_name = @$skin['name'] ? $skin['name'] : $base_file;
+          $skins[$base_file] = $skin_name;
+          break;
+
+      }
+    }
+    elseif (is_dir($src_file)) {
+      if (strpos($rpt_file, '.')!==0) {
+        $save_prefix = $prefix;
+        $prefix .=  '/' . $rpt_file;
+        $prefix = trim($prefix, '/');
+        forena_db_sync($prefix);
+        $prefix = $save_prefix;
+      }
+    }
+  }
+  if ($d) $d->close();
+  // Done with cache sync.
+  if (!$subdir) {
+    // Cache the skins found
+    asort($skins);
+    variable_set('forena_skins', $skins);
+    // Rebuild menus.
+    menu_rebuild();
+  }
+  return $save_count;
+}
+
+/**
+ *
+ * Enter description here ...
+ * @param $copy_reports If true, reports will by re-copied from
+ *         module source files to destination.
+ */
+function forena_sync_reports($copy_reports=FALSE) {
+  if ($copy_reports) {
+    $directories = module_invoke_all('forena_report_directory');
+    $i=0;
+    if ($directories) {
+      foreach ($directories as $src_dir) {
+        $i += _forena_copy_reports($src_dir, TRUE);
+      }
+      if ($i > 0) drupal_set_message($i . ' reports copied');
+    }
+  }
+  forena_db_sync();
+  menu_rebuild();
+}
+
+function forena_theme() {
+  return array(
+    'forena_web_report' => array(
+      'variables' => array('doc_types' => NULL, 'parameters' => NULL, 'content' => NULL),
+  ),
+    'forena_inline_form_element' => array(
+      'render element' => 'element',
+      'file' => 'forena.common.inc',
+  ),
+    'forena_inline_field' => array(
+      'render element' => 'field',
+      'file' => 'forena.common.inc',
+  ),
+    'forena_fieldset_template' => array(
+      'render element' => 'fieldset',
+      'file' => 'forena.common.inc',
+  ),
+
+  );
+}
+
+/**
+ * Default theme function for forena web reports.
+ * @param $variables Array of variables to theme
+ */
+function theme_forena_web_report ($variables) {
+  $output = '';
+  if (@$variables['parameters']) {
+    $output .= '<div id="forena-parameters">' . $variables['parameters'] . '</div>';
+  }
+  if (@$variables['doc_links']) {
+    $output .= "<div id='forena-doc-links'>" . $variables['doc_links']. '</div>';
+  }
+  $output .= '<div class="forena-report">' . $variables['content'] . '</div>';
+  return $output;
+}
+
+
+/**
+ * Iemplents hook_views_api
+ * @return multitype:number The Ambigous <The, string>
+ */
+function forena_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'forena') ,
+    'template path' => drupal_get_path('module', 'forena') ,
+  );
+}
+
+/**
+ * Implements hook_feeds_plugins().
+ */
+function forena_feeds_plugins() {
+  module_load_include('inc', 'forena', 'feeds/forena_feeds');
+  return _forena_feeds_plugins();
+}
+
+
+/**
+ * Implements hook_bean_types_api_info().
+ */
+function forena_bean_types_api_info() {
+  return array('api' => 4);
+}
+
+
+/**
+ * Implements hook_bean_types().
+ */
+function forena_bean_types() {
+  $plugins = array();
+  $plugin_path = drupal_get_path('module', 'forena') . '/bean';
+  $plugins['forena'] = array(
+    'label' => t('Forena report'),
+    'description' => t('Display a report.'),
+    'handler' => array(
+      'class' => 'FrxBean',
+      'parent' => 'bean',
+      'path' => $plugin_path,
+      'file' => 'FrxBean.inc',
+  ),
+    'path' => $plugin_path,
+    'file' => 'FrxBean.inc',
+  );
+  return $plugins;
+}
+
+/**
+ * Function to reflect back forms that are built by classes
+ * @param $formid
+ * @param $form_state form state array
+ * @param $form array of form elements to be reflected
+ */
+function forena_form_reflector($formid, &$form_state, $form) {
+  return $form;
+}
+
+
+
