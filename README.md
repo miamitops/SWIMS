@@ -1,2 +1,2 @@
-# SWIMS
-Somalia Water Information Management System
+# WSIMS
+Water Sources Information Management System
